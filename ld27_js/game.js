@@ -17,6 +17,30 @@ var fadein_cooldown = new Cooldown('1s', function()
 });
 view_layer.events.once('frame_logic', fadein_cooldown)
 
+var get_action_pos = function()
+{
+  var result = []
+  $.each(game.actions, function(i, action)
+  {
+    var a = {
+      sec: action.sec,
+    }
+    if (i == selected_action)
+    {
+      a.x = current_node[0]
+      a.y = current_node[1]
+    }
+    else
+    {
+      a.x = action.pos.x
+      a.y = action.pos.y
+    }
+    result.push(a)
+  })
+
+  return result
+}
+
 var set_current_pos = function()
 {
   var action = game.actions[selected_action]

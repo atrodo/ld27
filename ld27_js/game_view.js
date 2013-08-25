@@ -207,13 +207,13 @@ view_layer.add_animation(new Animation({
           var join_dn_action = false
           var next_col = col + cell_action.sec * 2
 
-          $.each(game.actions, function(i, action)
+          $.each(get_action_pos(), function(i, pos)
           {
-            if (action.pos.y == row && action.pos.x == next_col)
+            if (pos.y == row && pos.x == next_col)
               next_is_action = true
-            if (action.pos.y == row - 1 && action.pos.x == next_col)
+            if (pos.y == row - 1 && pos.x == next_col)
               join_up_action = true
-            if (action.pos.y == row + 1 && action.pos.x == next_col)
+            if (pos.y == row + 1 && pos.x == next_col)
               join_dn_action = true
           })
 
