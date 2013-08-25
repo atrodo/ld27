@@ -1,5 +1,14 @@
+[% INCLUDE "$game_js/game_action.js" %]
+
 var game = {
-  actions: [0, 1, 2, 3, 4, 5, 10]
+  actions: [
+    new Action(1),
+    new Action(2),
+    new Action(3),
+    new Action(4),
+    new Action(10),
+    new Action(5),
+  ]
 }
 
 var current_action = 0

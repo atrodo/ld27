@@ -87,9 +87,9 @@ view_layer.add_animation(new Animation({
     c.shadowOffsetX = 1
     c.shadowOffsetY = -1
 
-    $.each(game.actions, function(i, sec)
+    $.each(game.actions, function(i, action)
     {
-      c.fillText(sec + "s", 40, 40 * (i + 1) + 16)
+      c.fillText(action.sec + "s", 40, 40 * (i + 1) + 16)
     });
    
     return gfx;
