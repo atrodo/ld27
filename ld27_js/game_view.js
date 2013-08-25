@@ -42,6 +42,7 @@ view_layer.add_animation(new Animation({
     gfx.reset()
 
     var c = gfx.context
+
     c.fillStyle = 'rgb(0, 0, 0)'
     c.fillRect(0, 0, this.xw, this.yh)
 
@@ -86,6 +87,11 @@ view_layer.add_animation(new Animation({
     gfx.reset()
 
     var c = gfx.context
+
+    if (fadeou_cooldown != null)
+      c.globalAlpha = 1 - fadeou_cooldown.get_pctdone()
+    if (fadein_cooldown != null)
+      c.globalAlpha = fadein_cooldown.get_pctdone()
     c.translate(0, this.yh)
     c.scale(1, -1)
 
@@ -137,6 +143,11 @@ view_layer.add_animation(new Animation({
     gfx.reset()
 
     var c = gfx.context
+    if (fadeou_cooldown != null)
+      c.globalAlpha = 1 - fadeou_cooldown.get_pctdone()
+    if (fadein_cooldown != null)
+      c.globalAlpha = fadein_cooldown.get_pctdone()
+
     c.translate(0, this.yh)
     c.scale(1, -1)
 
@@ -158,7 +169,7 @@ view_layer.add_animation(new Animation({
     
     c.strokeStyle = 'rgba([% pal.hint %],0.6)'
 
-    for (var row = 0; row < max_time_rows; row++)
+    for (var row = 0; row < game.rows; row++)
     {
       for (var col = 0; col < [% time_slots %]; col++)
       {

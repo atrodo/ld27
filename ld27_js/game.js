@@ -1,26 +1,26 @@
 [% INCLUDE "$game_js/game_action.js" %]
+[% INCLUDE "$game_js/puzzles.js" %]
 
-var game = {
-  rows: 2,
-  actions: [
-    new Action(2.5),
-    new Action(2.5),
-    new Action(5),
-    new Action(1),
-    new Action(4),
-  ],
-  grid: []
-}
+var puzzle_num = 0;
+var game = puzzles[puzzle_num]
+game.grid = []
 
 var current_action = 0
 var current_node = [-1, -1]
 var selected_action = null
 var select_latch = false
 
+var fadeou_cooldown
+var fadein_cooldown = new Cooldown('1s', function()
+{
+  fadein_cooldown = null
+});
+view_layer.events.once('frame_logic', fadein_cooldown)
+
 var set_action_pos = function(action, x, y)
 {
   var max_x = [% time_slots %]
-  var max_y = max_time_rows
+  var max_y = game.rows
 
   // Make sure the position is sane
   if (y < 0)
@@ -45,6 +45,9 @@ var set_action_pos = function(action, x, y)
     game.grid = []
     var grid = game.grid = []
 
+    for (var i = 0; i < game.rows; i++)
+      grid[i] = []
+
     var solution_possible = true
 
     // Rebuild the grid
@@ -60,7 +63,7 @@ var set_action_pos = function(action, x, y)
       }
 
       if (grid[y] == null)
-        grid[y] = []
+        return
 
       for (var i = 0; i < action.sec * 2; i++)
       {
@@ -109,7 +112,28 @@ var set_action_pos = function(action, x, y)
     });
 
     if (solution_possible)
+    {
       console.log("Good")
+      view_layer.deactivate_input()
+      fadeou_cooldown = new Cooldown('1s', function()
+      {
+        fadeou_cooldown = null
+        view_layer.activate_input()
+
+        game = puzzles[++puzzle_num]
+
+        current_action = 0
+        current_node = [-1, -1]
+        selected_action = null
+
+        fadein_cooldown = new Cooldown('1s', function()
+        {
+          fadein_cooldown = null
+        });
+        view_layer.events.once('frame_logic', fadein_cooldown)
+      })
+      view_layer.events.once('frame_logic', fadeou_cooldown)
+    }
   [% END %]
 
   return [x, y]
@@ -163,7 +187,6 @@ input.add_action({
   },
 })
 
-var max_time_rows = game.rows
 input.add_action({
   up: function()
   {
