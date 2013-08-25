@@ -30,6 +30,7 @@ var set_action_pos = function(action, x, y)
   if (x >= [% time_slots %])
     x = 0
 
+  // Make sure we don't overlap with the end of the grid
   if (x + action.sec * 2 > [% time_slots %])
     x -= x + action.sec * 2 - [% time_slots %]
 
@@ -39,6 +40,7 @@ var set_action_pos = function(action, x, y)
 var input = new Input({ layer: view_layer })
 
 input.register_action("select",  "enter")
+input.register_action("cancel",  "esc")
 
 input.add_action({
   up: function()
@@ -152,10 +154,26 @@ input.add_action({
       return new Cooldown()
     }
 
+    game.actions[selected_action].pos = {x: current_node[0], y: current_node[1]}
     selected_action = null
     current_action = 0
     current_node = [-1, -1]
     select_latch = true
+
+    console.log(game)
+
+    return new Cooldown()
+  },
+  cancel: function()
+  {
+    if (selected_action == null)
+      return
+
+    selected_action = null
+    current_action = 0
+    current_node = [-1, -1]
+
+    console.log(game)
 
     return new Cooldown()
   },

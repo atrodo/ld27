@@ -141,30 +141,72 @@ view_layer.add_animation(new Animation({
           x += cell_size * 0.4
         }
 
+        var cell_action = null
+        $.each(game.actions, function(i, action)
+        {
+          if (i == selected_action)
+            return;
+
+          if (action.pos.x == col && action.pos.y == row)
+          {
+            cell_action = action
+            return false
+          }
+        })
+
+        var rgb = '151, 106, 45'
+
         if (row == current_node[1] && col == current_node[0])
         {
-          if (selected_action != null)
-          {
-            var cells = game.actions[selected_action].sec * 2 - 1
-            c.strokeStyle = 'rgb(16, 16, 16)'
-            c.beginPath();
-            c.moveTo(x + 23, y + 10)
-            c.lineTo(x + 23 + cells * cell_size, y + 10)
-            c.stroke();
+          cell_action = game.actions[selected_action]
+          rgb = '106, 67, 14'
+        }
 
-            col += cells
-          }
+        if (cell_action != null)
+        {
+          var cells = cell_action.sec * 2 - 1
+          c.strokeStyle = 'rgb(16, 16, 16)'
+          c.beginPath();
+          c.moveTo(x + 23, y + 10)
+          c.lineTo(x + 23 + cells * cell_size, y + 10)
+          c.stroke();
 
-          var rgb = '106, 67, 14'
           create_box(c, rgb, x, y)
 
           c.strokeStyle = 'rgba(252, 198, 143, 0.6)'
         }
         else
         {
-          c.beginPath()
-          c.rect(x, y, 22, 22)
-          c.stroke()
+          var on_path = false
+          $.each(game.actions, function(i, action)
+          {
+            if (i == selected_action)
+              return
+
+            var pos = action.pos
+            if (pos.y != row)
+              return;
+
+            if (col >= pos.x && col <= pos.x + action.sec * 2 - 1)
+            {
+              on_path = true
+              return false
+            }
+          })
+
+          if (row == current_node[1])
+          {
+            var action = game.actions[selected_action]
+            if (col >= current_node[0] && col <= current_node[0] + action.sec * 2 - 1)
+              on_path = true
+          }
+
+          if (!on_path)
+          {
+            c.beginPath()
+            c.rect(x, y, 22, 22)
+            c.stroke()
+          }
         }
       }
 
