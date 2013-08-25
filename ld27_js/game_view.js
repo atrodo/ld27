@@ -21,6 +21,26 @@ view_layer.add_animation(new Animation({
   }
 }));
 
+var create_box = function(c, rgb, x, y)
+{
+  var border_styles = [
+    'rgba(' + rgb + ', 1.0)',
+    'rgba(' + rgb + ', 0.6)',
+    'rgba(' + rgb + ', 0.3)',
+  ]
+
+  $.each(border_styles, function(border, style)
+  {
+    c.strokeStyle = style
+
+    border++
+
+    c.beginPath()
+    c.rect(x - border, y - border, 22 + border * 2, 22 + border * 2);
+    c.stroke()
+  })
+}
+
 [% action_grid_xw = 80 %]
 // The action grid
 view_layer.add_animation(new Animation({
@@ -49,23 +69,16 @@ view_layer.add_animation(new Animation({
       'rgba(255, 216, 154, 0.3)',
     ]
 
-    var boxes = [0, 1, 2, 3, 4, 5, 10]
-
-    $.each(border_styles, function(border, style)
+    $.each(game.actions, function(i)
     {
-      c.strokeStyle = style
-
       var x = 10
-      border++
+      var y = 40 * (i + 1)
 
-      $.each(boxes, function(i)
-      {
-        var y = 40 * (i + 1)
+      var rgb = '252, 198, 143'
+      if (i == current_action)
+        rgb = '106, 67, 14'
 
-        c.beginPath()
-        c.rect(x - border, y - border, 22 + border * 2, 22 + border * 2);
-        c.stroke()
-      })
+      create_box(c, rgb, x, y)
     })
 
     c.font = '16px san-serif'
@@ -74,7 +87,7 @@ view_layer.add_animation(new Animation({
     c.shadowOffsetX = 1
     c.shadowOffsetY = -1
 
-    $.each(boxes, function(i, sec)
+    $.each(game.actions, function(i, sec)
     {
       c.fillText(sec + "s", 40, 40 * (i + 1) + 16)
     });
@@ -116,21 +129,32 @@ view_layer.add_animation(new Animation({
     
     c.strokeStyle = 'rgba(252, 198, 143, 0.6)'
 
-    for (var row = 0; row < 8; row++)
+    for (var row = 0; row < max_time_rows; row++)
     {
       for (var col = 0; col < [% time_slots %]; col++)
       {
-        c.beginPath()
-        c.rect(col * cell_size + 50, cell_size * 2 * row + 50, 22, 22)
-        c.stroke()
+        var x = col * cell_size + 50
+        var y = cell_size * row + 50
+
+        if (row % 2 == 1)
+        {
+          x += cell_size * 0.4
+        }
+
+        if (row == current_node[1] && col == current_node[0])
+        {
+          var rgb = '106, 67, 14'
+          create_box(c, rgb, x, y)
+          c.strokeStyle = 'rgba(252, 198, 143, 0.6)'
+        }
+        else
+        {
+          c.beginPath()
+          c.rect(x, y, 22, 22)
+          c.stroke()
+        }
       }
 
-      for (var col = 0; col < [% time_slots %]; col++)
-      {
-        c.beginPath()
-        c.rect(col * cell_size + 50 + cell_size * 0.4, cell_size * 2 * row + (50 + cell_size), 22, 22)
-        c.stroke()
-      }
     }
 
     return gfx;
