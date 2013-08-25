@@ -143,8 +143,21 @@ view_layer.add_animation(new Animation({
 
         if (row == current_node[1] && col == current_node[0])
         {
+          if (selected_action != null)
+          {
+            var cells = game.actions[selected_action].sec * 2 - 1
+            c.strokeStyle = 'rgb(16, 16, 16)'
+            c.beginPath();
+            c.moveTo(x + 23, y + 10)
+            c.lineTo(x + 23 + cells * cell_size, y + 10)
+            c.stroke();
+
+            col += cells
+          }
+
           var rgb = '106, 67, 14'
           create_box(c, rgb, x, y)
+
           c.strokeStyle = 'rgba(252, 198, 143, 0.6)'
         }
         else

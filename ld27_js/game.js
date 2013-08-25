@@ -16,6 +16,26 @@ var current_node = [-1, -1]
 var selected_action = null
 var select_latch = false
 
+var set_action_pos = function(action, x, y)
+{
+
+  // Make sure the position is sane
+  if (y < 0)
+    y = max_time_rows - 1
+  if (y >= max_time_rows)
+    y = 0
+
+  if (x < 0)
+    x = [% time_slots %] - 1
+  if (x >= [% time_slots %])
+    x = 0
+
+  if (x + action.sec * 2 > [% time_slots %])
+    x -= x + action.sec * 2 - [% time_slots %]
+
+  return [x, y]
+}
+
 var input = new Input({ layer: view_layer })
 
 input.register_action("select",  "enter")
@@ -71,8 +91,11 @@ input.add_action({
       return
 
     current_node[1]--
-    if (current_node[1] < 0)
-      current_node[1] = max_time_rows
+
+    current_node = set_action_pos(
+        game.actions[selected_action],
+        current_node[0], current_node[1]
+    )
 
     return new Cooldown()
   },
@@ -82,8 +105,11 @@ input.add_action({
       return
 
     current_node[1]++
-    if (current_node[1] >= max_time_rows)
-      current_node[1] = 0
+
+    current_node = set_action_pos(
+        game.actions[selected_action],
+        current_node[0], current_node[1]
+    )
 
     return new Cooldown()
   },
@@ -93,8 +119,11 @@ input.add_action({
       return
 
     current_node[0]--
-    if (current_node[0] < 0)
-      current_node[0] = [% time_slots %]
+
+    current_node = set_action_pos(
+        game.actions[selected_action],
+        current_node[0], current_node[1]
+    )
 
     return new Cooldown()
   },
@@ -104,8 +133,11 @@ input.add_action({
       return
 
     current_node[0]++
-    if (current_node[0] >= [% time_slots %])
-      current_node[0] = 0
+
+    current_node = set_action_pos(
+        game.actions[selected_action],
+        current_node[0], current_node[1]
+    )
 
     return new Cooldown()
   },
