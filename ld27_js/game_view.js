@@ -1,3 +1,34 @@
+var bg;
+
+[% pal = {} %]
+[% pal.selected = '59, 247, 64' %]
+[% pal.unselect = '23, 157, 24' %]
+[% pal.hint     = '12,  66, 14' %]
+
+[% WRAPPER scope %]
+  var g = new Gfx([% width / 2 %], [% height / 2 %])
+
+  var rng = new lprng(null)
+
+  var c = g.context
+  var count = 0
+  for (var x = 0; x < g.xw(); x++)
+  {
+    for (var y = 0; y < g.yh(); y++)
+    {
+      if (rng.random() > 0.98)
+      {
+        count++
+        var l = floor(rng.random(10))
+        c.fillStyle = "hsl(121, 65%, "+ l + "%)"
+        c.fillRect(x, y, 1, 1)
+      }
+    }
+  }
+  console.log(count)
+
+  bg = new Animation({gfx: g, frame_x: 0, frame_y: 0,})
+[% END %]
 
 view_layer.add_animation(new Animation({
   frame_x: 0,
@@ -11,11 +42,11 @@ view_layer.add_animation(new Animation({
     gfx.reset()
 
     var c = gfx.context
-    c.translate(0, this.yh)
-    c.scale(1, -1)
-
-    c.fillStyle = 'rgba(247, 223, 187, 0.95)'
+    c.fillStyle = 'rgb(0, 0, 0)'
     c.fillRect(0, 0, this.xw, this.yh)
+
+    c.scale(2, 2)
+    gfx.draw_animation(bg)
 
     return gfx
   }
@@ -63,32 +94,30 @@ view_layer.add_animation(new Animation({
     c.fillStyle = 'rgba(0, 0, 0, 0)'
     c.lineWidth = 1
 
-    var border_styles = [
-      'rgba(106, 67, 14, 1.0)',
-      'rgba(252, 198, 143, 0.6)',
-      'rgba(255, 216, 154, 0.3)',
-    ]
-
     $.each(game.actions, function(i)
     {
       var x = 10
       var y = 40 * (i + 1)
 
-      var rgb = '252, 198, 143'
+      var rgb = '[% pal.unselect %]'
       if (i == current_action)
-        rgb = '106, 67, 14'
+        rgb = '[% pal.selected %]'
 
       create_box(c, rgb, x, y)
     })
 
     c.font = '16px san-serif'
-    c.fillStyle = 'rgb(205, 166, 126)'
     c.shadowColor = 'rgb(39, 12, 2)'
     c.shadowOffsetX = 1
     c.shadowOffsetY = -1
 
     $.each(game.actions, function(i, action)
     {
+      var rgb = '[% pal.unselect %]'
+      if (i == current_action)
+        rgb = '[% pal.selected %]'
+
+      c.fillStyle = 'rgb(' + rgb + ')'
       c.fillText(action.sec + "s", 40, 40 * (i + 1) + 16)
     });
    
@@ -127,7 +156,7 @@ view_layer.add_animation(new Animation({
     // Split everything into 10 seconds, in .5 increments
     var cell_size = grid_xw / [% time_slots %]
     
-    c.strokeStyle = 'rgba(252, 198, 143, 0.6)'
+    c.strokeStyle = 'rgba([% pal.hint %],0.6)'
 
     for (var row = 0; row < max_time_rows; row++)
     {
@@ -135,11 +164,6 @@ view_layer.add_animation(new Animation({
       {
         var x = col * cell_size + 50
         var y = cell_size * row + 50
-
-        if (row % 2 == 1)
-        {
-          x += cell_size * 0.4
-        }
 
         var cell_action = null
         $.each(game.actions, function(i, action)
@@ -154,26 +178,64 @@ view_layer.add_animation(new Animation({
           }
         })
 
-        var rgb = '151, 106, 45'
+        var rgb = '[% pal.unselect %]'
 
         if (row == current_node[1] && col == current_node[0])
         {
           cell_action = game.actions[selected_action]
-          rgb = '106, 67, 14'
+          rgb = '[% pal.selected %]'
         }
 
         if (cell_action != null)
         {
           var cells = cell_action.sec * 2 - 1
-          c.strokeStyle = 'rgb(16, 16, 16)'
+          var x_len = cells * cell_size
+
+          var next_is_action = false
+          var join_up_action = false
+          var join_dn_action = false
+          var next_col = col + cell_action.sec * 2
+
+          $.each(game.actions, function(i, action)
+          {
+            if (action.pos.y == row && action.pos.x == next_col)
+              next_is_action = true
+            if (action.pos.y == row - 1 && action.pos.x == next_col)
+              join_up_action = true
+            if (action.pos.y == row + 1 && action.pos.x == next_col)
+              join_dn_action = true
+          })
+
+          if (next_is_action)
+          {
+            x_len += 8
+          }
+          else if (join_up_action || join_dn_action)
+          {
+            x_len -= 10
+          }
+
+          c.strokeStyle = 'rgb([% pal.unselect %])'
           c.beginPath();
           c.moveTo(x + 23, y + 10)
-          c.lineTo(x + 23 + cells * cell_size, y + 10)
+          c.lineTo(x + 23 + x_len, y + 10)
+
+          if (!next_is_action)
+          {
+            if (join_up_action)
+            {
+              c.lineTo(x + 23 + x_len + 19, y + 10 - 19)
+            }
+            else if (join_dn_action)
+            {
+            }
+          }
+
           c.stroke();
 
           create_box(c, rgb, x, y)
 
-          c.strokeStyle = 'rgba(252, 198, 143, 0.6)'
+          c.strokeStyle = 'rgba([% pal.hint %],0.6)'
         }
         else
         {

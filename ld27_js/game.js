@@ -1,13 +1,13 @@
 [% INCLUDE "$game_js/game_action.js" %]
 
 var game = {
+  rows: 2,
   actions: [
-    new Action(1),
-    new Action(2),
-    new Action(3),
-    new Action(4),
-    new Action(10),
+    new Action(2.5),
+    new Action(2.5),
     new Action(5),
+    new Action(1),
+    new Action(4),
   ]
 }
 
@@ -18,21 +18,23 @@ var select_latch = false
 
 var set_action_pos = function(action, x, y)
 {
+  var max_x = [% time_slots %]
+  var max_y = max_time_rows
 
   // Make sure the position is sane
   if (y < 0)
-    y = max_time_rows - 1
-  if (y >= max_time_rows)
+    y = max_y - 1
+  if (y >= max_y)
     y = 0
 
   if (x < 0)
-    x = [% time_slots %] - 1
-  if (x >= [% time_slots %])
+    x = max_x - 1
+  if (x >= max_x)
     x = 0
 
   // Make sure we don't overlap with the end of the grid
-  if (x + action.sec * 2 > [% time_slots %])
-    x -= x + action.sec * 2 - [% time_slots %]
+  if (x + action.sec * 2 > max_x)
+    x -= x + action.sec * 2 - max_x
 
   return [x, y]
 }
@@ -85,7 +87,7 @@ input.add_action({
   },
 })
 
-var max_time_rows = [% time_rows %] * 2 - 2
+var max_time_rows = game.rows
 input.add_action({
   up: function()
   {
