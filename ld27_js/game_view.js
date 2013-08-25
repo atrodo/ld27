@@ -95,8 +95,6 @@ view_layer.add_animation(new Animation({
     c.translate(0, this.yh)
     c.scale(1, -1)
 
-    c.fillRect(0, 0, this.xw, 10)
-
     c.fillStyle = 'rgba(0, 0, 0, 0)'
     c.lineWidth = 1
 
@@ -157,11 +155,6 @@ view_layer.add_animation(new Animation({
     c.translate(0, this.yh)
     c.scale(1, -1)
 
-    c.fillRect(0, 0, this.xw, 10)
-
-    c.fillStyle = 'rgba(0, 0, 0, 0)'
-    c.lineWidth = 1
-
     var grid_xw = this.xw - 10*2
 
     // Reserve space for the person
@@ -173,6 +166,14 @@ view_layer.add_animation(new Animation({
     // Split everything into 10 seconds, in .5 increments
     var cell_size = grid_xw / [% time_slots %]
     
+    c.font = '11px san-serif'
+    c.fillStyle = 'rgb([% pal.unselect %])'
+
+    for (var col = 0; col <= [% time_slots %]; col++)
+    {
+      c.fillText( (col / 2).toFixed(1) + "s", 40 + col * cell_size, 40 )
+    }
+
     c.strokeStyle = 'rgba([% pal.hint %],0.6)'
 
     for (var row = 0; row < game.rows; row++)
