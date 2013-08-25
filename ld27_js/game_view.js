@@ -212,7 +212,7 @@ view_layer.add_animation(new Animation({
           }
           else if (join_up_action || join_dn_action)
           {
-            x_len -= 10
+            x_len -= 11
           }
 
           c.strokeStyle = 'rgb([% pal.unselect %])'
@@ -228,6 +228,7 @@ view_layer.add_animation(new Animation({
             }
             else if (join_dn_action)
             {
+              c.lineTo(x + 23 + x_len + 19, y + 10 + 19)
             }
           }
 
