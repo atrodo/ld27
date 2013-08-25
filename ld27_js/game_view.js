@@ -176,6 +176,8 @@ view_layer.add_animation(new Animation({
         var x = col * cell_size + 50
         var y = cell_size * row + 50
 
+        var rgb = '[% pal.unselect %]'
+
         var cell_action = null
         $.each(game.actions, function(i, action)
         {
@@ -184,12 +186,12 @@ view_layer.add_animation(new Animation({
 
           if (action.pos.x == col && action.pos.y == row)
           {
+            if (i == current_action)
+              rgb = '[% pal.selected %]'
             cell_action = action
             return false
           }
         })
-
-        var rgb = '[% pal.unselect %]'
 
         if (row == current_node[1] && col == current_node[0])
         {
