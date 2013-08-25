@@ -100,8 +100,11 @@ view_layer.add_animation(new Animation({
     c.fillStyle = 'rgba(0, 0, 0, 0)'
     c.lineWidth = 1
 
-    $.each(game.actions, function(i)
+    $.each(game.actions, function(i, action)
     {
+      if (action.fixed)
+        return
+
       var x = 10
       var y = 40 * (i + 1)
 
@@ -119,6 +122,9 @@ view_layer.add_animation(new Animation({
 
     $.each(game.actions, function(i, action)
     {
+      if (action.fixed)
+        return
+
       var rgb = '[% pal.unselect %]'
       if (i == current_action)
         rgb = '[% pal.selected %]'
@@ -199,6 +205,9 @@ view_layer.add_animation(new Animation({
           rgb = '[% pal.selected %]'
         }
 
+        if (cell_action != null && cell_action.show == false)
+          continue
+
         if (cell_action != null)
         {
           var cells = cell_action.sec * 2 - 1
@@ -211,6 +220,9 @@ view_layer.add_animation(new Animation({
 
           $.each(get_action_pos(), function(i, pos)
           {
+            if (!pos.show)
+              return
+
             if (pos.y == row && pos.x == next_col)
               next_is_action = true
             if (pos.y == row - 1 && pos.x == next_col)

@@ -24,6 +24,7 @@ var get_action_pos = function()
   {
     var a = {
       sec: action.sec,
+      show: action.show,
     }
     if (i == selected_action)
     {
@@ -104,10 +105,18 @@ var set_current_pos = function()
           return false
         }
 
-        grid[y][x + i] = -1
+        // Fixed, unshown actions cannot be used
+        if (!action.show)
+        {
+          grid[y][x + i] = false
+        }
+        else
+        {
+          grid[y][x + i] = -1
 
-        if (i == 0)
-          grid[y][x + i] = i
+          if (i == 0)
+            grid[y][x + i] = i
+        }
       }
     })
 
@@ -119,21 +128,23 @@ var set_current_pos = function()
 
       for (var x = 0; x < [% time_slots %]; x++)
       {
-        if (grid[y][x] == undefined)
+        if (typeof grid[y][x] != "number")
         {
           // We can join another row if the one above or below us is >= 0
-          if (x > 0 && grid[y + 1] != undefined && grid[y + 1][x] >= 0)
-          {
-            x--
-            y++
-            continue
-          }
-          if (x > 0 && grid[y - 1] != undefined && grid[y - 1][x] >= 0)
-          {
-            x--
-            y--
-            continue
-          }
+          if (x > 0 && grid[y + 1] != undefined)
+            if (typeof grid[y + 1][x] == "number" && grid[y + 1][x] >= 0)
+            {
+              x--
+              y++
+              continue
+            }
+          if (x > 0 && typeof grid[y - 1] == "number" && grid[y - 1][x] >= 0)
+            if (typeof grid[y - 1][x] == "number" && grid[y - 1][x] >= 0)
+            {
+              x--
+              y--
+              continue
+            }
 
           solution_possible = false
           return false
@@ -179,9 +190,12 @@ input.add_action({
     if (current_action == null)
       return
 
-    current_action--
-    if (current_action < 0)
-      current_action = game.actions.length-1
+    do
+    {
+      current_action--
+      if (current_action < 0)
+        current_action = game.actions.length-1
+    } while (game.actions[current_action].fixed)
 
     return new Cooldown()
   },
@@ -190,9 +204,12 @@ input.add_action({
     if (current_action == null)
       return
 
-    current_action++
-    if (current_action >= game.actions.length)
-      current_action = 0
+    do
+    {
+      current_action++
+      if (current_action >= game.actions.length)
+        current_action = 0
+    } while (game.actions[current_action].fixed)
 
     return new Cooldown()
   },
