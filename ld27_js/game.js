@@ -138,7 +138,7 @@ var set_current_pos = function()
               y++
               continue
             }
-          if (x > 0 && typeof grid[y - 1] == "number" && grid[y - 1][x] >= 0)
+          if (x > 0 && grid[y - 1] != undefined)
             if (typeof grid[y - 1][x] == "number" && grid[y - 1][x] >= 0)
             {
               x--
