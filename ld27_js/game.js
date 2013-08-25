@@ -17,8 +17,12 @@ var fadein_cooldown = new Cooldown('1s', function()
 });
 view_layer.events.once('frame_logic', fadein_cooldown)
 
-var set_action_pos = function(action, x, y)
+var set_current_pos = function()
 {
+  var action = game.actions[selected_action]
+  var x = current_node[0]
+  var y = current_node[1]
+
   var max_x = [% time_slots %]
   var max_y = game.rows
 
@@ -37,6 +41,8 @@ var set_action_pos = function(action, x, y)
   if (x + action.sec * 2 > max_x)
     x -= x + action.sec * 2 - max_x
 
+  current_node[0] = x
+  current_node[1] = y
 
   // Make sure we arn't on the same place as another
 
@@ -136,7 +142,6 @@ var set_action_pos = function(action, x, y)
     }
   [% END %]
 
-  return [x, y]
 }
 
 var input = new Input({ layer: view_layer })
@@ -183,6 +188,8 @@ input.add_action({
     current_node = [0, 0]
     select_latch = true
 
+    set_current_pos()
+
     return new Cooldown()
   },
 })
@@ -195,10 +202,7 @@ input.add_action({
 
     current_node[1]--
 
-    current_node = set_action_pos(
-        game.actions[selected_action],
-        current_node[0], current_node[1]
-    )
+    set_current_pos()
 
     return new Cooldown()
   },
@@ -209,10 +213,7 @@ input.add_action({
 
     current_node[1]++
 
-    current_node = set_action_pos(
-        game.actions[selected_action],
-        current_node[0], current_node[1]
-    )
+    set_current_pos()
 
     return new Cooldown()
   },
@@ -223,10 +224,7 @@ input.add_action({
 
     current_node[0]--
 
-    current_node = set_action_pos(
-        game.actions[selected_action],
-        current_node[0], current_node[1]
-    )
+    set_current_pos()
 
     return new Cooldown()
   },
@@ -237,10 +235,7 @@ input.add_action({
 
     current_node[0]++
 
-    current_node = set_action_pos(
-        game.actions[selected_action],
-        current_node[0], current_node[1]
-    )
+    set_current_pos()
 
     return new Cooldown()
   },
@@ -255,10 +250,7 @@ input.add_action({
       return new Cooldown()
     }
 
-    current_node = set_action_pos(
-        game.actions[selected_action],
-        current_node[0], current_node[1]
-    )
+    set_current_pos()
 
     game.actions[selected_action].pos = {x: current_node[0], y: current_node[1]}
     current_action = selected_action
